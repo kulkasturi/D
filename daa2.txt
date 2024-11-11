@@ -1,0 +1,79 @@
+import java.util.*;
+
+public class HuffmanEncoding {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter text: ");
+        String text = sc.nextLine();
+        sc.close();
+
+        // Step 1: Calculate frequencies
+        int[] freq = new int[256];
+        for (char ch : text.toCharArray()) {
+            freq[ch]++;
+        }
+
+        // Step 2: Build priority queue of nodes
+        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(n -> n.freq));
+        for (int i = 0; i < 256; i++) {
+            if (freq[i] > 0) {
+                queue.add(new Node((char) i, freq[i]));
+            }
+        }
+
+        // Step 3: Build Huffman Tree
+        while (queue.size() > 1) {
+            Node left = queue.poll();
+            Node right = queue.poll();
+            Node merged = new Node('\0', left.freq + right.freq);
+            merged.left = left;
+            merged.right = right;
+            queue.add(merged);
+        }
+
+        // Step 4: Generate Huffman codes
+        Node root = queue.peek();
+        String[] codes = new String[256];
+        generateCodes(root, "", codes);
+
+        // Step 5: Print Huffman codes
+        System.out.println("Huffman Codes:");
+        for (int i = 0; i < 256; i++) {
+            if (codes[i] != null) {
+                System.out.println((char) i + ": " + codes[i]);
+            }
+        }
+
+        // Step 6: Encode the text using the generated codes
+        System.out.print("Encoded Text: ");
+        for (char ch : text.toCharArray()) {
+            System.out.print(codes[ch]);
+        }
+    }
+
+    // Recursive function to generate Huffman codes
+    static void generateCodes(Node node, String code, String[] codes) {
+        if (node == null) return;
+        if (node.left == null && node.right == null) {
+            codes[node.ch] = code;
+        }
+        generateCodes(node.left, code + "0", codes);
+        generateCodes(node.right, code + "1", codes);
+    }
+}
+
+
+
+
+import java.util.*;
+
+class Node {
+    char ch;
+    int freq;
+    Node left, right;
+
+    Node(char ch, int freq) {
+        this.ch = ch;
+        this.freq = freq;
+    }
+}
